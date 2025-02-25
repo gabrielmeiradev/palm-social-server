@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  user_id       String  @id
+  username      String? @unique
+  profile_image String?
+  likes         Like[]
+  posts         Post[]
+}
+
+model Hashtag {
+  hashtag_id String @id @default(cuid())
+  title      String @unique
+  posts      Post[]
+}
+
+model Post {
+  post_id      String    @id @default(cuid())
+  parent_id    String?
+  author_id    String
+  text_content String
+  medias       String[]
+  likes_count  Int       @default(0)
+  group_id     String?
+  created_at   DateTime  @default(now())
+  likes        Like[]
+  author       User      @relation(fields: [author_id], references: [user_id])
+  group        Group?    @relation(fields: [group_id], references: [group_id])
+  parent       Post?     @relation("PostToPost", fields: [parent_id], references: [post_id])
+  comments     Post[]    @relation("PostToPost")
+  hashtags     Hashtag[]
+}
+
+model Like {
+  user_id String
+  post_id String
+  post    Post   @relation(fields: [post_id], references: [post_id])
+  user    User   @relation(fields: [user_id], references: [user_id])
+
+  @@id([user_id, post_id])
+}
+
+model Group {
+  group_id String @id @default(cuid())
+  name     String
+  posts    Post[]
+}
