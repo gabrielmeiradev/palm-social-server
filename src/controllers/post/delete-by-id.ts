@@ -1,6 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
-import { getUserIdFromToken } from "../../utils/token";
 import { StatusCodes } from "http-status-codes";
 
 const prisma = new PrismaClient();
@@ -17,10 +16,28 @@ export const deletePostById = async (req: Request, res: Response) => {
       },
     });
 
-    await prisma.post.delete({
+    const post = await prisma.post.findUnique({
       where: {
         post_id: id,
-        author_id: author_id as string,
+      },
+    });
+
+    if (!post || post.author_id !== author_id) {
+      res.status(StatusCodes.FORBIDDEN).json({ error: "Não autorizado" });
+      return;
+    }
+
+    await prisma.post.deleteMany({
+      where: {
+        OR: [
+          {
+            post_id: id,
+            author_id: author_id as string,
+          },
+          {
+            parent_id: id,
+          },
+        ],
       },
     });
 

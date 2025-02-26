@@ -22,20 +22,21 @@ model Hashtag {
 }
 
 model Post {
-  post_id      String    @id @default(cuid())
-  parent_id    String?
-  author_id    String
-  text_content String
-  medias       String[]
-  likes_count  Int       @default(0)
-  group_id     String?
-  created_at   DateTime  @default(now())
-  likes        Like[]
-  author       User      @relation(fields: [author_id], references: [user_id])
-  group        Group?    @relation(fields: [group_id], references: [group_id])
-  parent       Post?     @relation("PostToPost", fields: [parent_id], references: [post_id])
-  comments     Post[]    @relation("PostToPost")
-  hashtags     Hashtag[]
+  post_id        String    @id @default(cuid())
+  parent_id      String?
+  author_id      String
+  text_content   String
+  medias         String[]
+  likes_count    Int       @default(0)
+  group_id       String?
+  created_at     DateTime  @default(now())
+  comments_count Int       @default(0)
+  likes          Like[]
+  author         User      @relation(fields: [author_id], references: [user_id])
+  group          Group?    @relation(fields: [group_id], references: [group_id])
+  parent         Post?     @relation("PostToPost", fields: [parent_id], references: [post_id])
+  comments       Post[]    @relation("PostToPost")
+  hashtags       Hashtag[]
 }
 
 model Like {

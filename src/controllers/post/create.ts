@@ -20,7 +20,25 @@ export const createPost = async (req: Request, res: Response) => {
 
   const images = req.files as Express.Multer.File[];
 
-  console.log(images);
+  if (parent_id) {
+    try {
+      const parentPost = await prisma.post.update({
+        where: { post_id: parent_id },
+        data: {
+          comments_count: {
+            increment: 1,
+          },
+        },
+      });
+
+      if (!parentPost) {
+        return res.status(404).json({ error: "Post pai não encontrado" });
+      }
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "Falha ao buscar post pai" });
+    }
+  }
 
   try {
     const post = await prisma.post.create({
