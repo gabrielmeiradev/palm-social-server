@@ -6,15 +6,19 @@ const prisma = new PrismaClient();
 export const getCommentsById = async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const comments = await prisma.post.findMany({
-    where: {
-      parent_id: id,
-    },
-    include: {
-      author: true,
-      hashtags: true,
-    },
-  });
+  try {
+    const comments = await prisma.post.findMany({
+      where: {
+        parent_id: id,
+      },
+      include: {
+        author: true,
+        hashtags: true,
+      },
+    });
 
-  res.status(200).json(comments);
+    res.status(200).json(comments);
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao buscar comentários" });
+  }
 };

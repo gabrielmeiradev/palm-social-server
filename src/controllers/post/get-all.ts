@@ -14,9 +14,10 @@ export const getAllPosts = async (req: Request, res: Response) => {
     const itemsCount = parseInt(itemsPerPage as string, 10);
 
     if (pageNumber < 1) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
+      res.status(StatusCodes.BAD_REQUEST).json({
         error: "O número da página deve ser maior que 0.",
       });
+      return;
     }
 
     const [posts, totalPosts] = await Promise.all([

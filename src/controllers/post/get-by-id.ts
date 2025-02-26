@@ -7,14 +7,25 @@ const prisma = new PrismaClient();
 export const getPostById = async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const post = await prisma.post.findUnique({
-    where: {
-      post_id: id,
-    },
-    include: {
-      hashtags: true,
-    },
-  });
+  try {
+    const post = await prisma.post.findUnique({
+      where: {
+        post_id: id,
+      },
+      include: {
+        hashtags: true,
+      },
+    });
 
-  res.status(StatusCodes.OK).json(post);
+    if (!post) {
+      res.status(StatusCodes.NOT_FOUND).json({ error: "Post não encontrado" });
+      return;
+    }
+
+    res.status(StatusCodes.OK).json(post);
+  } catch (error) {
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: "Ocorreu um erro ao buscar o post" });
+  }
 };

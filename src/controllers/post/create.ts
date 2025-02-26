@@ -32,11 +32,13 @@ export const createPost = async (req: Request, res: Response) => {
       });
 
       if (!parentPost) {
-        return res.status(404).json({ error: "Post pai não encontrado" });
+        res.status(404).json({ error: "Post pai não encontrado" });
+        return;
       }
     } catch (error) {
       console.error(error);
-      return res.status(500).json({ error: "Falha ao buscar post pai" });
+      res.status(500).json({ error: "Falha ao buscar post pai" });
+      return;
     }
   }
 
