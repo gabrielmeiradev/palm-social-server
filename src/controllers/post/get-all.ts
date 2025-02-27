@@ -27,6 +27,7 @@ export const getAllPosts = async (req: Request, res: Response) => {
             contains: text as string,
             mode: "insensitive",
           },
+          parent_id: null,
           AND:
             hashtagsArray.length > 0
               ? {
