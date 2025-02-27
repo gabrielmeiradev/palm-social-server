@@ -25,9 +25,13 @@ const fileFilter = (
   file: Express.Multer.File,
   cb: multer.FileFilterCallback
 ) => {
+  const allowedExtensions = ["jpg", "jpeg", "png", "gif", "mp4", "mov", "avi"];
+  const extension = file.originalname.split(".").pop()?.toLowerCase();
+
   if (
-    file.mimetype.startsWith("image/") ||
-    file.mimetype.startsWith("video/")
+    /^image\/|^video\//.test(file.mimetype) &&
+    extension &&
+    allowedExtensions.includes(extension)
   ) {
     cb(null, true);
   } else {
