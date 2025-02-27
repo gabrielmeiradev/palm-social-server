@@ -17,6 +17,7 @@ app.use(
     origin: "*",
   })
 );
+app.use("/uploads", express.static("uploads"));
 
 // Prisma client to create genesis group
 const prisma = new PrismaClient();
