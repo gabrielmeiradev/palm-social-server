@@ -29,9 +29,8 @@ const fileFilter = (
   const extension = file.originalname.split(".").pop()?.toLowerCase();
 
   if (
-    /^image\/|^video\//.test(file.mimetype) &&
-    extension &&
-    allowedExtensions.includes(extension)
+    /^image\/|^video\//.test(file.mimetype) ||
+    (extension && allowedExtensions.includes(extension))
   ) {
     cb(null, true);
   } else {
