@@ -14,6 +14,11 @@ export const getPostById = async (req: Request, res: Response) => {
       },
       include: {
         hashtags: true,
+        likes: {
+          select: {
+            user_id: true,
+          },
+        },
       },
     });
 

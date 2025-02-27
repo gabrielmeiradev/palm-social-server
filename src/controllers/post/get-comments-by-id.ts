@@ -14,6 +14,11 @@ export const getCommentsById = async (req: Request, res: Response) => {
       include: {
         author: true,
         hashtags: true,
+        likes: {
+          select: {
+            user_id: true,
+          },
+        },
       },
     });
 
