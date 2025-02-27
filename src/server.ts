@@ -1,5 +1,6 @@
 // Dependencies
 import express from "express";
+import cors from "cors";
 import { StatusCodes } from "http-status-codes";
 
 // Import routes
@@ -11,6 +12,11 @@ import { PrismaClient } from "@prisma/client";
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 
 // Prisma client to create genesis group
 const prisma = new PrismaClient();
