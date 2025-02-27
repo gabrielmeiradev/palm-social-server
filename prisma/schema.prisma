@@ -40,12 +40,11 @@ model Post {
 }
 
 model Like {
+  like_id String @id @default(cuid())
   user_id String
   post_id String
   post    Post   @relation(fields: [post_id], references: [post_id])
   user    User   @relation(fields: [user_id], references: [user_id])
-
-  @@id([user_id, post_id])
 }
 
 model Group {

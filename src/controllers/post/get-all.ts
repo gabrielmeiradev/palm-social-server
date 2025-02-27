@@ -47,6 +47,11 @@ export const getAllPosts = async (req: Request, res: Response) => {
             },
           },
           author: true,
+          likes: {
+            select: {
+              user_id: true,
+            },
+          },
         },
         skip: (pageNumber - 1) * itemsCount,
         take: itemsCount,

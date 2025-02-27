@@ -11,24 +11,49 @@ export const likePostById = async (req: Request, res: Response) => {
   const userId = req.headers["userid"];
 
   try {
-    await prisma.like.create({
-      data: {
+    const like = await prisma.like.findFirst({
+      where: {
         post_id: id,
         user_id: userId as string,
       },
     });
 
-    await prisma.post.update({
-      where: { post_id: id },
-      data: {
-        likes_count: {
-          increment: 1,
+    if (!like) {
+      await prisma.like.create({
+        data: {
+          post_id: id,
+          user_id: userId as string,
         },
-      },
-    });
+      });
 
-    res.status(StatusCodes.OK).json({ message: "Post curtido" });
-    return;
+      await prisma.post.update({
+        where: { post_id: id },
+        data: {
+          likes_count: {
+            increment: 1,
+          },
+        },
+      });
+
+      res.status(StatusCodes.OK).json({ message: "Post curtido" });
+    } else {
+      await prisma.like.delete({
+        where: {
+          like_id: like.like_id,
+        },
+      });
+
+      await prisma.post.update({
+        where: { post_id: id },
+        data: {
+          likes_count: {
+            decrement: 1,
+          },
+        },
+      });
+      res.status(StatusCodes.OK).json({ message: "Post descurtido" });
+      return;
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Falha ao curtir o post" });
