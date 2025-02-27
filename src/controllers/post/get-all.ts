@@ -50,6 +50,9 @@ export const getAllPosts = async (req: Request, res: Response) => {
         },
         skip: (pageNumber - 1) * itemsCount,
         take: itemsCount,
+        orderBy: {
+          created_at: "desc",
+        },
       }),
       prisma.post.count({
         where: {
