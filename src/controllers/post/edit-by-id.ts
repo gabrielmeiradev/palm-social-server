@@ -27,7 +27,7 @@ export const editPostById = async (req: Request, res: Response) => {
 
     // Delete existing images from the server
     existingPost.medias.forEach((media) => {
-      const filePath = path.join(__dirname, "../../../uploads", media);
+      const filePath = path.join(__dirname, "../../../", media);
       fs.unlink(filePath, (err) => {
         if (err) {
           console.error(`Erro ao deletar arquivo: ${filePath}`, err);
