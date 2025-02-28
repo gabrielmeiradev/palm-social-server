@@ -1,19 +1,19 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
-import { getUserIdFromToken } from "../../utils/token";
 import { PostCreationInput } from "./create";
+import fs from "fs";
+import path from "path";
 
 const prisma = new PrismaClient();
 
 export const editPostById = async (req: Request, res: Response) => {
   const { id } = req.params;
-
   const author_id = req.headers["userid"];
-
   const { text_content, hashtags } = req.body as PostCreationInput;
   const hashtagsArray = hashtags
-    .split(",")
-    .map((hashtag) => hashtag.trim().toLowerCase());
+    ? hashtags.split(",").map((hashtag) => hashtag.trim().toLowerCase())
+    : [];
+  const newImages = req.files as Express.Multer.File[];
 
   try {
     const existingPost = await prisma.post.findUnique({
@@ -25,6 +25,27 @@ export const editPostById = async (req: Request, res: Response) => {
       return;
     }
 
+    // Delete existing images from the server
+    existingPost.medias.forEach((media) => {
+      const filePath = path.join(__dirname, "../../../uploads", media);
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error(`Erro ao deletar arquivo: ${filePath}`, err);
+        }
+      });
+    });
+
+    // Disconnect existing hashtags
+    await prisma.post.update({
+      where: { post_id: id },
+      data: {
+        hashtags: {
+          set: [],
+        },
+      },
+    });
+
+    // Upsert new hashtags
     await Promise.all(
       hashtagsArray.map(async (hashtag) => {
         await prisma.hashtag.upsert({
@@ -35,10 +56,12 @@ export const editPostById = async (req: Request, res: Response) => {
       })
     );
 
+    // Update post with new content, hashtags, and images
     const post = await prisma.post.update({
       where: { post_id: id },
       data: {
         text_content,
+        medias: newImages.map((image) => image.path),
         hashtags: {
           connect: hashtagsArray.map((hashtag) => ({ title: hashtag })),
         },

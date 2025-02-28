@@ -53,7 +53,7 @@ postRouter.get("/:id", getPostById);
 
 postRouter.delete("/:id", deletePostById);
 
-postRouter.put("/:id", editPostById);
+postRouter.post("/:id", upload.array("media"), editPostById);
 
 postRouter.post("/:id/like", likePostById);
 
