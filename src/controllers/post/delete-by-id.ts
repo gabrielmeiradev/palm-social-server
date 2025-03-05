@@ -27,6 +27,17 @@ export const deletePostById = async (req: Request, res: Response) => {
       return;
     }
 
+    await prisma.post.update({
+      where: {
+        post_id: post.parent_id ?? "",
+      },
+      data: {
+        comments_count: {
+          decrement: 1,
+        },
+      },
+    });
+
     await prisma.post.deleteMany({
       where: {
         OR: [
