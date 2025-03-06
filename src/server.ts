@@ -6,6 +6,8 @@ import { StatusCodes } from "http-status-codes";
 // Import routes
 import postRouter from "./routes/post.routes";
 import checkInRouter from "./routes/checkin.routes";
+import hashtagRouter from "./routes/hashtag.routes";
+
 import { PrismaClient } from "@prisma/client";
 
 // Setting up server
@@ -25,6 +27,7 @@ const prisma = new PrismaClient();
 // Routes
 app.use("/posts", postRouter);
 app.use("/checkin", checkInRouter);
+app.use("/hashtags", hashtagRouter);
 
 // Heartbeat
 app.get("/heartbeat", (_, res) => {
