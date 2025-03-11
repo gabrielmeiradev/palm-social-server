@@ -21,7 +21,7 @@ export const editPostById = async (req: Request, res: Response) => {
       ...extractedHashtags.map((ht: string) => ht.slice(1)),
     ]),
   ];
-  const newImages = req.files as Express.Multer.File[];
+  const newImages = (req.files as Express.Multer.File[]) ?? [];
 
   try {
     const existingPost = await prisma.post.findUnique({
@@ -63,8 +63,6 @@ export const editPostById = async (req: Request, res: Response) => {
         });
       })
     );
-
-    console.log(newImages);
 
     // Update post with new content, hashtags, and images
     const post = await prisma.post.update({
