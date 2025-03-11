@@ -64,6 +64,8 @@ export const editPostById = async (req: Request, res: Response) => {
       })
     );
 
+    console.log(newImages);
+
     // Update post with new content, hashtags, and images
     const post = await prisma.post.update({
       where: { post_id: id },
