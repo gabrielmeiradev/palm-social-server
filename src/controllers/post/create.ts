@@ -28,8 +28,6 @@ export const createPost = async (req: Request, res: Response) => {
     ]),
   ];
 
-  console.log(extractedHashtags);
-
   const images = req.files as Express.Multer.File[];
 
   if (parent_id) {
