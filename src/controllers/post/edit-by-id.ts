@@ -10,9 +10,15 @@ export const editPostById = async (req: Request, res: Response) => {
   const { id } = req.params;
   const author_id = req.headers["userid"];
   const { text_content, hashtags } = req.body as PostCreationInput;
-  const hashtagsArray = hashtags
-    ? hashtags.split(",").map((hashtag) => hashtag.trim().toLowerCase())
-    : [];
+  let hashtagsArray = hashtags?.split(",") ?? [];
+
+  const extractedHashtags = text_content.match(/#[a-zA-Z0-9_]+/g) || [];
+  hashtagsArray = [
+    ...new Set([
+      ...hashtagsArray,
+      ...extractedHashtags.map((ht: string) => ht.slice(1)),
+    ]),
+  ];
   const newImages = req.files as Express.Multer.File[];
 
   try {
