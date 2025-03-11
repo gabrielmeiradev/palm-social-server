@@ -9,6 +9,8 @@ export const updatePost = async (req: Request, res: Response) => {
 
   let hashtagsArray = hashtags?.split(",") ?? [];
 
+  console.log(hashtagsArray);
+
   const extractedHashtags = text_content.match(/#[a-zA-Z0-9_]+/g) || [];
   hashtagsArray = [
     ...new Set([
