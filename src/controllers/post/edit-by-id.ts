@@ -10,9 +10,11 @@ export const editPostById = async (req: Request, res: Response) => {
   const { id } = req.params;
   const author_id = req.headers["userid"];
   const { text_content, hashtags } = req.body as PostCreationInput;
+
   let hashtagsArray = hashtags?.split(",") ?? [];
 
   const extractedHashtags = text_content.match(/#[a-zA-Z0-9_]+/g) || [];
+  console.log(hashtagsArray, extractedHashtags);
   hashtagsArray = [
     ...new Set([
       ...hashtagsArray,
