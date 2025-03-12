@@ -78,7 +78,7 @@ export const editPostById = async (req: Request, res: Response) => {
         text_content,
         medias: mediasPaths,
         hashtags: {
-          connect: hashtagsArray.map((hashtag) => ({ title: hashtag })),
+          connect: hashtagsArray.map((hashtag) => ({ title: hashtag.toLowerCase().replaceAll("#", "") })),
         },
       },
       include: { hashtags: true },
