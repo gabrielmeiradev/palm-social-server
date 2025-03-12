@@ -16,15 +16,12 @@ export const createPost = async (req: Request, res: Response) => {
 
   const { parent_id, text_content, hashtags } = req.body as PostCreationInput;
 
-  console.log(hashtags);
 
   let hashtagsArray = hashtags?.split(",") ?? [];
-
-  const extractedHashtags = text_content.match(/#[a-zA-Z0-9_]+/g) || [];
+  
   hashtagsArray = [
     ...new Set([
       ...hashtagsArray,
-      ...extractedHashtags.map((ht) => ht.slice(1)),
     ]),
   ];
 
@@ -62,8 +59,8 @@ export const createPost = async (req: Request, res: Response) => {
         medias: images.map((image) => image.path),
         hashtags: {
           connectOrCreate: hashtagsArray.map((hashtag) => ({
-            where: { title: hashtag.toLowerCase() },
-            create: { title: hashtag.toLowerCase() },
+            where: { title: hashtag.toLowerCase().replaceAll("#", "") },
+            create: { title: hashtag.toLowerCase().replaceAll("#", "") },
           })),
         },
       },
