@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 // import { getUserIdFromToken } from "../../utils/token";
 import { Request, Response } from "express";
 import { genesisGroup } from "../../server";
+import { userModelFromToken } from "../../utils/token";
 
 export type PostCreationInput = {
   parent_id?: string;
@@ -12,18 +13,11 @@ export type PostCreationInput = {
 const prisma = new PrismaClient();
 
 export const createPost = async (req: Request, res: Response) => {
-  const author_id = req.headers["userid"];
-
   const { parent_id, text_content, hashtags } = req.body as PostCreationInput;
 
-
   let hashtagsArray = hashtags?.split(",") ?? [];
-  
-  hashtagsArray = [
-    ...new Set([
-      ...hashtagsArray,
-    ]),
-  ];
+
+  hashtagsArray = [...new Set([...hashtagsArray])];
 
   const images = req.files as Express.Multer.File[];
 
@@ -50,12 +44,14 @@ export const createPost = async (req: Request, res: Response) => {
   }
 
   try {
+    const { IdUser } = userModelFromToken(req.headers.authorization!);
+
     const post = await prisma.post.create({
       data: {
         parent_id: parent_id ?? null,
         group_id: genesisGroup.group_id,
         text_content,
-        author_id: author_id as string,
+        author_id: IdUser,
         medias: images.map((image) => image.path),
         hashtags: {
           connectOrCreate: hashtagsArray.map((hashtag) => ({

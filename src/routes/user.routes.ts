@@ -3,6 +3,7 @@ import multer from "multer";
 import { Router } from "express";
 
 import { createUser } from "../controllers/user/create";
+import { Login } from "../controllers/user/login";
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -19,7 +20,7 @@ const fileFilter = (
   file: Express.Multer.File,
   cb: multer.FileFilterCallback
 ) => {
-  const allowedExtensions = ["jpg", "jpeg", "png"];
+  const allowedExtensions = ["jpg", "jpeg", "png", "webp"];
   const extension = file.originalname.split(".").pop()?.toLowerCase();
 
   if (
@@ -40,6 +41,8 @@ const upload = multer({
 
 const userRouter = Router();
 
-userRouter.post("/", upload.array("media"), createUser);
+userRouter.post("/register", upload.single("profilePicture"), createUser);
+
+userRouter.post("/login", Login);
 
 export default userRouter;

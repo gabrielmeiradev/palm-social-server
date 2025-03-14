@@ -1,20 +1,20 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
-import { getUserIdFromToken } from "../../utils/token";
 import { StatusCodes } from "http-status-codes";
+import { userModelFromToken } from "../../utils/token";
 
 const prisma = new PrismaClient();
 
 export const likePostById = async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const userId = req.headers["userid"];
+  const author_id = userModelFromToken(req.headers.authorization!).IdUser;
 
   try {
     const like = await prisma.like.findFirst({
       where: {
         post_id: id,
-        user_id: userId as string,
+        user_id: author_id as string,
       },
     });
 
@@ -22,7 +22,7 @@ export const likePostById = async (req: Request, res: Response) => {
       await prisma.like.create({
         data: {
           post_id: id,
-          user_id: userId as string,
+          user_id: author_id as string,
         },
       });
 

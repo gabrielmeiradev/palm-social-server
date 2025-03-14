@@ -3,22 +3,21 @@ import { PrismaClient } from "@prisma/client";
 import { PostCreationInput } from "./create";
 import fs from "fs";
 import path from "path";
+import { userModelFromToken } from "../../utils/token";
 const prisma = new PrismaClient();
+
 export const editPostById = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { deletePreviousMedia } = req.query;
-  const author_id = req.headers["userid"];
+
   const { text_content, hashtags } = req.body as PostCreationInput;
   let hashtagsArray = hashtags?.split(",") ?? [];
-  
-  hashtagsArray = [
-    ...new Set([
-      ...hashtagsArray,
-    ]),
-  ];
-  
-  const newImages = (req.files as Express.Multer.File[]);
+
+  hashtagsArray = [...new Set([...hashtagsArray])];
+
+  const newImages = req.files as Express.Multer.File[];
   try {
+    const author_id = userModelFromToken(req.headers.authorization!).IdUser;
     const existingPost = await prisma.post.findUnique({
       where: { post_id: id, author_id: author_id as string },
     });
@@ -27,11 +26,9 @@ export const editPostById = async (req: Request, res: Response) => {
       return;
     }
 
- console.log(deletePreviousMedia)
     let mediasPaths = existingPost.medias;
     if (newImages.length > 0 || deletePreviousMedia) {
       existingPost.medias.forEach((media) => {
-	  
         const filePath = path.join(__dirname, "../../../", media);
         fs.unlink(filePath, (err) => {
           if (err) {
@@ -39,16 +36,12 @@ export const editPostById = async (req: Request, res: Response) => {
           }
         });
       });
-	  
-	  if(newImages.length > 0) {
-	 
-		mediasPaths = newImages.map((image) => image.path);
-		
-	  } else if (deletePreviousMedia == "1") {
-	  
-		mediasPaths = []
-	  }
-	  
+
+      if (newImages.length > 0) {
+        mediasPaths = newImages.map((image) => image.path);
+      } else if (deletePreviousMedia == "1") {
+        mediasPaths = [];
+      }
     }
 
     await prisma.post.update({
@@ -69,8 +62,8 @@ export const editPostById = async (req: Request, res: Response) => {
         });
       })
     );
-	
-	 console.log(mediasPaths)
+
+    console.log(mediasPaths);
 
     const post = await prisma.post.update({
       where: { post_id: id },
@@ -78,7 +71,9 @@ export const editPostById = async (req: Request, res: Response) => {
         text_content,
         medias: mediasPaths,
         hashtags: {
-          connect: hashtagsArray.map((hashtag) => ({ title: hashtag.toLowerCase().replaceAll("#", "") })),
+          connect: hashtagsArray.map((hashtag) => ({
+            title: hashtag.toLowerCase().replaceAll("#", ""),
+          })),
         },
       },
       include: { hashtags: true },

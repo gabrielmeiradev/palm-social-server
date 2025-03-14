@@ -1,19 +1,23 @@
+import { User } from "@prisma/client";
 import jwt from "jsonwebtoken";
 
 const secret = "MMMM";
 
-function generateAccessToken(userId: string) {
-  return jwt.sign({ userId }, secret, { expiresIn: "15m" });
+function accessTokenFromUser(user: object) {
+  return jwt.sign(user, secret, { expiresIn: "15m" });
 }
 
-function getUserIdFromToken(token: string): string | null {
+function checkAccessToken(token: string) {
+  return jwt.verify(token, secret);
+}
+
+function userModelFromToken(token: string): User {
   try {
-    const decoded = jwt.verify(token, secret) as { userId: string };
-    return decoded.userId;
+    const user = jwt.decode(token) as User;
+    return user;
   } catch (error) {
-    console.error("Invalid token", error);
-    return null;
+    throw new Error("Token inválido");
   }
 }
 
-export { generateAccessToken, getUserIdFromToken };
+export { accessTokenFromUser, checkAccessToken, userModelFromToken };

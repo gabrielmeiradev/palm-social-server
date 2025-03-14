@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
+import { encryptPassword } from "../../utils/password";
 
 interface CreateUserInput {
   username: string;
@@ -12,20 +13,27 @@ interface CreateUserInput {
 const prisma = new PrismaClient();
 
 export const createUser = async (req: Request, res: Response) => {
-  const { username, fullName, phone, email, password } =
-    req.body as CreateUserInput;
+  try {
+    const file = req.file;
 
-  await prisma.user.create({
-    data: {
-      Nome: fullName,
-      Email: email,
-      Telefone: phone,
-      Senha: password,
-      Login: username,
-      ProfileImage: "",
-    },
-  });
+    const { username, fullName, phone, email, password } =
+      req.body as CreateUserInput;
 
-  res.status(200).json({ message: "User created" });
-  return;
+    await prisma.user.create({
+      data: {
+        Nome: fullName,
+        Email: email,
+        Telefone: phone,
+        Senha: await encryptPassword(password),
+        Login: username,
+        ProfileImage: file?.path ?? "",
+      },
+    });
+
+    res.status(200).json({ message: "Usuário criado com sucesso" });
+    return;
+  } catch (error) {
+    res.status(500).json({ message: "Erro ao criar usuário" });
+    return;
+  }
 };
