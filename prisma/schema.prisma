@@ -8,11 +8,18 @@ datasource db {
 }
 
 model User {
-  user_id       String  @id
-  username      String? @unique
-  profile_image String?
-  likes         Like[]
-  posts         Post[]
+  IdUser   String  @id @default(cuid())
+  Login    String? @unique
+  Nome     String?
+  Email    String? @unique
+  Senha    String?
+  Telefone String?
+  TipoUser String? @default("Membro")
+
+  ProfileImage String?
+
+  likes Like[]
+  posts Post[]
 }
 
 model Hashtag {
@@ -32,7 +39,7 @@ model Post {
   created_at     DateTime  @default(now())
   comments_count Int       @default(0)
   likes          Like[]
-  author         User      @relation(fields: [author_id], references: [user_id])
+  author         User      @relation(fields: [author_id], references: [IdUser])
   group          Group?    @relation(fields: [group_id], references: [group_id])
   parent         Post?     @relation("PostToPost", fields: [parent_id], references: [post_id])
   comments       Post[]    @relation("PostToPost")
@@ -44,7 +51,7 @@ model Like {
   user_id String
   post_id String
   post    Post   @relation(fields: [post_id], references: [post_id])
-  user    User   @relation(fields: [user_id], references: [user_id])
+  user    User   @relation(fields: [user_id], references: [IdUser])
 }
 
 model Group {
