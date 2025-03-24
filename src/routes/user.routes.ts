@@ -23,11 +23,7 @@ const fileFilter = (
   const allowedExtensions = ["jpg", "jpeg", "png", "webp"];
   const extension = file.originalname.split(".").pop()?.toLowerCase();
 
-  if (
-    /^image\//.test(file.mimetype) &&
-    extension &&
-    allowedExtensions.includes(extension)
-  ) {
+  if (extension && allowedExtensions.includes(extension)) {
     cb(null, true);
   } else {
     cb(null, false);
