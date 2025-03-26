@@ -10,7 +10,7 @@ interface LoginInput {
 
 const prisma = new PrismaClient();
 
-export const Login = async (req: Request, res: Response) => {
+export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body as LoginInput;
 
@@ -42,7 +42,11 @@ export const Login = async (req: Request, res: Response) => {
 
     const token = accessTokenFromUser(user);
 
-    res.status(200).json({ message: "Usuário logado", token });
+    const { Senha, ...userWithoutPassword } = user;
+
+    res
+      .status(200)
+      .json({ message: "Usuário logado", token, userWithoutPassword });
     return;
   } catch (error) {
     console.error(error);

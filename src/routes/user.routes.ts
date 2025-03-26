@@ -3,7 +3,7 @@ import multer from "multer";
 import { Router } from "express";
 
 import { createUser } from "../controllers/user/create";
-import { Login } from "../controllers/user/login";
+import { login } from "../controllers/user/login";
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -39,6 +39,6 @@ const userRouter = Router();
 
 userRouter.post("/register", upload.single("profilePicture"), createUser);
 
-userRouter.post("/login", Login);
+userRouter.post("/login", login);
 
 export default userRouter;
