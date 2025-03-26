@@ -6,7 +6,7 @@ export default function checkToken(
   res: Response,
   next: NextFunction
 ) {
-  const token = req.headers.authorization;
+  let token = req.headers.authorization;
 
   if (!token) {
     res.status(401).json({ message: "Token não informado" });
@@ -14,6 +14,7 @@ export default function checkToken(
   }
 
   try {
+    token = token.replace("Bearer ", "");
     checkAccessToken(token);
     next();
   } catch (error) {
