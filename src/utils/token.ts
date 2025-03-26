@@ -13,6 +13,7 @@ function checkAccessToken(token: string) {
 
 function userModelFromToken(token: string): User {
   try {
+    token = token.replace("Bearer ", "");
     const user = jwt.decode(token) as User;
     return user;
   } catch (error) {
