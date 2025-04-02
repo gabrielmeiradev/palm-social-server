@@ -8,14 +8,17 @@ export type PostCreationInput = {
   parent_id?: string;
   text_content: string;
   hashtags: string;
+  categories: string;
 };
 
 const prisma = new PrismaClient();
 
 export const createPost = async (req: Request, res: Response) => {
-  const { parent_id, text_content, hashtags } = req.body as PostCreationInput;
+  const { parent_id, text_content, hashtags, categories } =
+    req.body as PostCreationInput;
 
   let hashtagsArray = hashtags?.split(",") ?? [];
+  let categoriesArray = categories?.split(",") ?? [];
 
   hashtagsArray = [...new Set([...hashtagsArray])];
 
@@ -53,6 +56,11 @@ export const createPost = async (req: Request, res: Response) => {
         text_content,
         author_id: IdUser,
         medias: images.map((image) => image.path),
+        categories: {
+          connect: categoriesArray.map((category) => ({
+            category_id: category,
+          })),
+        },
         hashtags: {
           connectOrCreate: hashtagsArray.map((hashtag) => ({
             where: { title: hashtag.toLowerCase().replaceAll("#", "") },

@@ -47,6 +47,11 @@ export const getAllPosts = async (req: Request, res: Response) => {
               title: true,
             },
           },
+          categories: {
+            select: {
+              title: true,
+            },
+          },
           author: true,
           likes: {
             select: {
