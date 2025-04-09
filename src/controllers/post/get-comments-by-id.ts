@@ -24,6 +24,6 @@ export const getCommentsById = async (req: Request, res: Response) => {
 
     res.status(200).json({ posts: comments });
   } catch (error) {
-    res.status(500).json({ error: "Erro ao buscar comentários" });
+    res.status(500).json({ message: "Erro ao buscar comentários" });
   }
 };

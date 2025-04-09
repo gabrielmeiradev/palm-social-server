@@ -8,13 +8,13 @@ datasource db {
 }
 
 model User {
-  IdUser   String  @id @default(cuid())
-  Login    String? @unique
+  IdUser   String    @id @default(cuid())
+  Login    String?   @unique
   Nome     String?
-  Email    String? @unique
+  Email    String?   @unique
   Senha    String?
   Telefone String?
-  TipoUser String? @default("Membro")
+  TipoUser UserType? @default(Membro)
 
   ProfileImage String?
 
@@ -67,4 +67,9 @@ model Category {
   slug        String @unique
   title       String
   posts       Post[] @relation("PostCategories")
+}
+
+enum UserType {
+  Membro
+  Anunciante
 }

@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 import { encryptPassword } from "../../utils/password";
+import { getUserTypeFromString } from "../../utils/user";
 
 interface CreateUserInput {
   username: string;
@@ -33,7 +34,7 @@ export const createUser = async (req: Request, res: Response) => {
         Senha: await encryptPassword(password),
         Login: username,
         ProfileImage: file?.path ?? "",
-        TipoUser: userType ?? "Membro",
+        TipoUser: getUserTypeFromString(userType),
       },
     });
 

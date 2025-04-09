@@ -35,6 +35,6 @@ export const getAllHashtags = async (req: Request, res: Response) => {
     console.error(error);
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ error: "Falha ao buscar hashtags" });
+      .json({ message: "Falha ao buscar hashtags" });
   }
 };

@@ -25,7 +25,7 @@ export const deletePostById = async (req: Request, res: Response) => {
     });
 
     if (!post || post.author_id !== IdUser) {
-      res.status(StatusCodes.FORBIDDEN).json({ error: "Não autorizado" });
+      res.status(StatusCodes.FORBIDDEN).json({ message: "Não autorizado" });
       return;
     }
 
@@ -71,7 +71,7 @@ export const deletePostById = async (req: Request, res: Response) => {
     console.error(error);
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ error: "Falha ao deletar post" });
+      .json({ message: "Falha ao deletar post" });
     return;
   }
 };

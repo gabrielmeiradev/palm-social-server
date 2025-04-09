@@ -22,7 +22,7 @@ export const editPostById = async (req: Request, res: Response) => {
       where: { post_id: id, author_id: author_id as string },
     });
     if (!existingPost) {
-      res.status(404).json({ error: "Post não encontrado ou autorizado" });
+      res.status(404).json({ message: "Post não encontrado ou autorizado" });
       return;
     }
 
@@ -81,6 +81,6 @@ export const editPostById = async (req: Request, res: Response) => {
     res.status(200).json(post);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Falha ao editar post" });
+    res.status(500).json({ message: "Falha ao editar post" });
   }
 };

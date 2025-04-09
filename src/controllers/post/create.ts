@@ -3,6 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 import { genesisGroup } from "../../server";
 import { userModelFromToken } from "../../utils/token";
+import { StatusCodes } from "http-status-codes";
 
 export type PostCreationInput = {
   parent_id?: string;
@@ -36,12 +37,12 @@ export const createPost = async (req: Request, res: Response) => {
       });
 
       if (!parentPost) {
-        res.status(404).json({ error: "Post pai não encontrado" });
+        res.status(404).json({ message: "Post pai não encontrado" });
         return;
       }
     } catch (error) {
       console.error(error);
-      res.status(500).json({ error: "Falha ao buscar post pai" });
+      res.status(500).json({ message: "Falha ao buscar post pai" });
       return;
     }
   }
@@ -50,7 +51,7 @@ export const createPost = async (req: Request, res: Response) => {
     const { IdUser } = userModelFromToken(req.headers.authorization!);
 
     if (!IdUser) {
-      res.status(401).json({ error: "Usuário não autenticado" });
+      res.status(401).json({ message: "Usuário não autenticado" });
       return;
     }
 
@@ -59,11 +60,13 @@ export const createPost = async (req: Request, res: Response) => {
     });
 
     if (!user) {
-      res.status(404).json({ error: "Usuário não encontrado" });
+      res.status(404).json({ message: "Usuário não encontrado" });
       return;
     }
 
     let isAdvertiser = false;
+
+    console.log(user);
 
     if (user.TipoUser === "Anunciante") {
       isAdvertiser = true;
@@ -85,8 +88,8 @@ export const createPost = async (req: Request, res: Response) => {
         const hoursDifference = timeDifference / (1000 * 60 * 60);
 
         if (hoursDifference < 24) {
-          res.status(400).json({
-            error: "Você só pode criar um post a cada 24 horas.",
+          res.status(StatusCodes.UNAUTHORIZED).json({
+            message: "Você só pode criar um post a cada 24 horas.",
           });
           return;
         }
@@ -118,6 +121,6 @@ export const createPost = async (req: Request, res: Response) => {
     res.status(201).json(post);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Falha ao criar post" });
+    res.status(500).json({ message: "Falha ao criar post" });
   }
 };

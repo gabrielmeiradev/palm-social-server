@@ -25,7 +25,9 @@ export const getPostById = async (req: Request, res: Response) => {
     });
 
     if (!post) {
-      res.status(StatusCodes.NOT_FOUND).json({ error: "Post não encontrado" });
+      res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ message: "Post não encontrado" });
       return;
     }
 
@@ -33,6 +35,6 @@ export const getPostById = async (req: Request, res: Response) => {
   } catch (error) {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ error: "Ocorreu um erro ao buscar o post" });
+      .json({ message: "Ocorreu um erro ao buscar o post" });
   }
 };

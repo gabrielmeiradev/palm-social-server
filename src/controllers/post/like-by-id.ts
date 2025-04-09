@@ -56,7 +56,7 @@ export const likePostById = async (req: Request, res: Response) => {
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Falha ao curtir o post" });
+    res.status(500).json({ message: "Falha ao curtir o post" });
     return;
   }
 };
