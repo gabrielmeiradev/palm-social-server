@@ -9,6 +9,7 @@ import hashtagRouter from "./routes/hashtag.routes";
 import userRouter from "./routes/user.routes";
 
 import { PrismaClient } from "@prisma/client";
+import categoryRouter from "./routes/category.routes";
 
 // Setting up server
 const app = express();
@@ -28,6 +29,7 @@ const prisma = new PrismaClient();
 app.use("/posts", postRouter);
 app.use("/user", userRouter);
 app.use("/hashtags", hashtagRouter);
+app.use("/categories", categoryRouter);
 
 // Heartbeat
 app.get("/heartbeat", (_, res) => {
