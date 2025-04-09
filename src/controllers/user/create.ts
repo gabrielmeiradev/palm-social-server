@@ -8,6 +8,7 @@ interface CreateUserInput {
   phone: string;
   email: string;
   password: string;
+  userType: "Anunciante" | "Membro";
 }
 
 const prisma = new PrismaClient();
@@ -16,7 +17,7 @@ export const createUser = async (req: Request, res: Response) => {
   try {
     const file = req.file as Express.Multer.File;
 
-    const { username, fullName, phone, email, password } =
+    const { username, fullName, phone, email, password, userType } =
       req.body as CreateUserInput;
 
     if (!file) {
@@ -32,6 +33,7 @@ export const createUser = async (req: Request, res: Response) => {
         Senha: await encryptPassword(password),
         Login: username,
         ProfileImage: file?.path ?? "",
+        TipoUser: userType ?? "Membro",
       },
     });
 

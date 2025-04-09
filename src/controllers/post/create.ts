@@ -49,6 +49,50 @@ export const createPost = async (req: Request, res: Response) => {
   try {
     const { IdUser } = userModelFromToken(req.headers.authorization!);
 
+    if (!IdUser) {
+      res.status(401).json({ error: "Usuário não autenticado" });
+      return;
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { IdUser: IdUser },
+    });
+
+    if (!user) {
+      res.status(404).json({ error: "Usuário não encontrado" });
+      return;
+    }
+
+    let isAdvertiser = false;
+
+    if (user.TipoUser === "Anunciante") {
+      isAdvertiser = true;
+
+      const lastPost = await prisma.post.findFirst({
+        where: {
+          author_id: IdUser,
+        },
+        orderBy: {
+          created_at: "desc",
+        },
+        take: 1,
+      });
+
+      if (lastPost) {
+        const lastPostDate = new Date(lastPost.created_at);
+        const currentDate = new Date();
+        const timeDifference = currentDate.getTime() - lastPostDate.getTime();
+        const hoursDifference = timeDifference / (1000 * 60 * 60);
+
+        if (hoursDifference < 24) {
+          res.status(400).json({
+            error: "Você só pode criar um post a cada 24 horas.",
+          });
+          return;
+        }
+      }
+    }
+
     const post = await prisma.post.create({
       data: {
         parent_id: parent_id ?? null,
@@ -56,6 +100,7 @@ export const createPost = async (req: Request, res: Response) => {
         text_content,
         author_id: IdUser,
         medias: images.map((image) => image.path),
+        is_advertisement: isAdvertiser,
         categories: {
           connect: categoriesArray.map((category) => ({
             category_id: category,
