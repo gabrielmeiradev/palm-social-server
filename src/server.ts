@@ -22,9 +22,6 @@ app.use(
 );
 app.use("/uploads", express.static("uploads"));
 
-// Prisma client to create genesis group
-const prisma = new PrismaClient();
-
 // Routes
 app.use("/posts", postRouter);
 app.use("/user", userRouter);
@@ -36,18 +33,7 @@ app.get("/heartbeat", (_, res) => {
   res.status(StatusCodes.OK).send("Beating!");
 });
 
-export let genesisGroup: {
-  group_id: string;
-  name: string;
-};
-
 // Server host
 app.listen(3000, async () => {
-  genesisGroup = await prisma.group.create({
-    data: {
-      name: "Genesis",
-    },
-  });
-
   console.log("Server is running on port 3000");
 });

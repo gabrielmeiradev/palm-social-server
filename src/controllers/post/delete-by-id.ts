@@ -11,7 +11,7 @@ export const deletePostById = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
-    const { IdUser } = userModelFromToken(req.headers.authorization!);
+    const { id } = userModelFromToken(req.headers.authorization!);
     await prisma.like.deleteMany({
       where: {
         post_id: id,
@@ -24,7 +24,7 @@ export const deletePostById = async (req: Request, res: Response) => {
       },
     });
 
-    if (!post || post.author_id !== IdUser) {
+    if (!post || post.author_id !== id) {
       res.status(StatusCodes.FORBIDDEN).json({ message: "Não autorizado" });
       return;
     }
@@ -47,7 +47,7 @@ export const deletePostById = async (req: Request, res: Response) => {
         OR: [
           {
             post_id: id,
-            author_id: IdUser,
+            author_id: id,
           },
           {
             parent_id: id,

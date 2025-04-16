@@ -1,7 +1,7 @@
-import { PrismaClient } from "@prisma/client";
+import { $Enums, PrismaClient } from "@prisma/client";
 // import { getUserIdFromToken } from "../../utils/token";
 import { Request, Response } from "express";
-import { genesisGroup } from "../../server";
+
 import { userModelFromToken } from "../../utils/token";
 import { StatusCodes } from "http-status-codes";
 
@@ -48,15 +48,15 @@ export const createPost = async (req: Request, res: Response) => {
   }
 
   try {
-    const { IdUser } = userModelFromToken(req.headers.authorization!);
+    const { id } = userModelFromToken(req.headers.authorization!);
 
-    if (!IdUser) {
+    if (!id) {
       res.status(401).json({ message: "Usuário não autenticado" });
       return;
     }
 
     const user = await prisma.user.findUnique({
-      where: { IdUser: IdUser },
+      where: { id: id },
     });
 
     if (!user) {
@@ -68,12 +68,12 @@ export const createPost = async (req: Request, res: Response) => {
 
     console.log(user);
 
-    if (user.TipoUser === "Anunciante") {
+    if (user.type === $Enums.UserType.Advertiser) {
       isAdvertiser = true;
 
       const lastPost = await prisma.post.findFirst({
         where: {
-          author_id: IdUser,
+          author_id: id,
         },
         orderBy: {
           created_at: "desc",
@@ -99,9 +99,9 @@ export const createPost = async (req: Request, res: Response) => {
     const post = await prisma.post.create({
       data: {
         parent_id: parent_id ?? null,
-        group_id: genesisGroup.group_id,
+
         text_content,
-        author_id: IdUser,
+        author_id: id,
         medias: images.map((image) => image.path),
         is_advertisement: isAdvertiser,
         categories: {

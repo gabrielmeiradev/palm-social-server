@@ -8,18 +8,19 @@ datasource db {
 }
 
 model User {
-  IdUser   String    @id @default(cuid())
-  Login    String?   @unique
-  Nome     String?
-  Email    String?   @unique
-  Senha    String?
-  Telefone String?
-  TipoUser UserType? @default(Membro)
+  id       String    @id @default(cuid())
+  username String?   @unique
+  name     String?
+  email    String?   @unique
+  type     UserType? @default(Member)
 
-  ProfileImage String?
+  likes         Like[]
+  posts         Post[]
+  Group         Group?  @relation(fields: [groupGroup_id], references: [group_id])
+  groupGroup_id String?
 
-  likes Like[]
-  posts Post[]
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model Hashtag {
@@ -39,7 +40,7 @@ model Post {
   created_at       DateTime   @default(now())
   comments_count   Int        @default(0)
   likes            Like[]
-  author           User       @relation(fields: [author_id], references: [IdUser])
+  author           User       @relation(fields: [author_id], references: [id])
   group            Group?     @relation(fields: [group_id], references: [group_id])
   parent           Post?      @relation("PostToPost", fields: [parent_id], references: [post_id])
   comments         Post[]     @relation("PostToPost")
@@ -53,13 +54,14 @@ model Like {
   user_id String
   post_id String
   post    Post   @relation(fields: [post_id], references: [post_id])
-  user    User   @relation(fields: [user_id], references: [IdUser])
+  user    User   @relation(fields: [user_id], references: [id])
 }
 
 model Group {
   group_id String @id @default(cuid())
-  name     String
+  alias    String @unique
   posts    Post[]
+  users    User[]
 }
 
 model Category {
@@ -70,6 +72,6 @@ model Category {
 }
 
 enum UserType {
-  Membro
-  Anunciante
+  Member
+  Advertiser
 }

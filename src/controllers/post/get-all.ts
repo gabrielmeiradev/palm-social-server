@@ -19,7 +19,7 @@ export const getAllPosts = async (req: Request, res: Response) => {
 
     let filterOnlyAds = false;
 
-    if (user.TipoUser == $Enums.UserType.Anunciante) {
+    if (user.type == $Enums.UserType.Advertiser) {
       filterOnlyAds = true;
     }
 
@@ -44,8 +44,8 @@ export const getAllPosts = async (req: Request, res: Response) => {
           },
           parent_id: null,
           author: {
-            TipoUser: {
-              equals: filterOnlyAds ? $Enums.UserType.Anunciante : undefined,
+            type: {
+              equals: filterOnlyAds ? $Enums.UserType.Advertiser : undefined,
             },
           },
           AND:
@@ -72,16 +72,7 @@ export const getAllPosts = async (req: Request, res: Response) => {
               title: true,
             },
           },
-          author: {
-            select: {
-              Senha: false,
-              Login: true,
-              Nome: true,
-              TipoUser: true,
-              ProfileImage: true,
-              IdUser: true,
-            },
-          },
+          author: true,
           likes: {
             select: {
               user_id: true,

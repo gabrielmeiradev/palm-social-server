@@ -17,7 +17,7 @@ export const editPostById = async (req: Request, res: Response) => {
 
   const newImages = req.files as Express.Multer.File[];
   try {
-    const author_id = userModelFromToken(req.headers.authorization!).IdUser;
+    const author_id = userModelFromToken(req.headers.authorization!).id;
     const existingPost = await prisma.post.findUnique({
       where: { post_id: id, author_id: author_id as string },
     });

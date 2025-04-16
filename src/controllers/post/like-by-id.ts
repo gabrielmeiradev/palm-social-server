@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 export const likePostById = async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const author_id = userModelFromToken(req.headers.authorization!).IdUser;
+  const author_id = userModelFromToken(req.headers.authorization!).id;
 
   try {
     const like = await prisma.like.findFirst({
