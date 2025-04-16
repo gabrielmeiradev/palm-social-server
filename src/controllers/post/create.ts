@@ -4,18 +4,20 @@ import { Request, Response } from "express";
 
 import { userModelFromToken } from "../../utils/token";
 import { StatusCodes } from "http-status-codes";
+import getGroupById from "../../services/group/getById";
 
 export type PostCreationInput = {
   parent_id?: string;
   text_content: string;
   hashtags: string;
   categories: string;
+  group_id?: string;
 };
 
 const prisma = new PrismaClient();
 
 export const createPost = async (req: Request, res: Response) => {
-  const { parent_id, text_content, hashtags, categories } =
+  const { group_id, parent_id, text_content, hashtags, categories } =
     req.body as PostCreationInput;
 
   let hashtagsArray = hashtags?.split(",") ?? [];
@@ -47,6 +49,27 @@ export const createPost = async (req: Request, res: Response) => {
     }
   }
 
+  if (!group_id) {
+    res.status(400).json({ message: "Grupo não informado" });
+    return;
+  }
+
+  try {
+    const group = await getGroupById(group_id);
+
+    const isUserInGroup = group.users.find(
+      (user) => user.id === userModelFromToken(req.headers.authorization!).id
+    );
+    if (!isUserInGroup) {
+      res.status(403).json({ message: "Usuário não pertence ao grupo" });
+      return;
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Falha ao buscar grupo", details: error });
+    return;
+  }
+
   try {
     const { id } = userModelFromToken(req.headers.authorization!);
 
@@ -65,8 +88,6 @@ export const createPost = async (req: Request, res: Response) => {
     }
 
     let isAdvertiser = false;
-
-    console.log(user);
 
     if (user.type === $Enums.UserType.Advertiser) {
       isAdvertiser = true;
@@ -99,7 +120,7 @@ export const createPost = async (req: Request, res: Response) => {
     const post = await prisma.post.create({
       data: {
         parent_id: parent_id ?? null,
-
+        group_id: group_id,
         text_content,
         author_id: id,
         medias: images.map((image) => image.path),

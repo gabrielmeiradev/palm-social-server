@@ -11,6 +11,9 @@ export default async function createGroupIfNotExists(
     create: {
       alias,
     },
+    include: {
+      users: true,
+    },
   });
   return group;
 }

@@ -5,6 +5,7 @@ import createUserIfNotExists from "../../services/user/checkIn";
 import createGroupIfNotExists from "../../services/group/checkIn";
 import { StatusCodes } from "http-status-codes";
 import addUserToGroup from "../../services/group/addUser";
+import getFirstGroupByUser from "../../services/group/getFirstByUser";
 
 export async function checkInUser(req: Request, res: Response) {
   const { username, name, alias } = req.body;
@@ -16,6 +17,7 @@ export async function checkInUser(req: Request, res: Response) {
 
   let userToken;
   let userCreated;
+  let group;
 
   try {
     const { user, wasCreated } = await createUserIfNotExists(username, name);
@@ -24,13 +26,8 @@ export async function checkInUser(req: Request, res: Response) {
 
     if (wasCreated) {
       userCreated = user;
-    } else {
-      // if user was not created it means the user already have a group
-      res.status(StatusCodes.OK).json({
-        userToken,
-      });
-      return;
     }
+    group = await getFirstGroupByUser(user.id);
   } catch (e) {
     let message = "Erro ao fazer check-in do usuário";
     console.log(message);
@@ -38,28 +35,28 @@ export async function checkInUser(req: Request, res: Response) {
     return;
   }
 
-  let group;
+  if (userCreated) {
+    try {
+      group = await createGroupIfNotExists(alias);
+    } catch (e) {
+      let message = "Erro ao fazer check-in do grupo";
+      console.log(message);
+      res.status(500).json({ error: message, details: e });
+      return;
+    }
 
-  try {
-    group = await createGroupIfNotExists(alias);
-  } catch (e) {
-    let message = "Erro ao fazer check-in do grupo";
-    console.log(message);
-    res.status(500).json({ error: message, details: e });
-    return;
+    try {
+      await addUserToGroup(group.group_id, userCreated.id);
+    } catch (e) {
+      let message = "Erro ao fazer adicionar usuário ao grupo";
+      console.log(message);
+      res.status(500).json({ error: message, details: e });
+      return;
+    }
   }
-
-  try {
-    await addUserToGroup(group.group_id, userCreated.id);
-  } catch (e) {
-    let message = "Erro ao fazer adicionar usuário ao grupo";
-    console.log(message);
-    res.status(500).json({ error: message, details: e });
-    return;
-  }
-
   res.status(StatusCodes.OK).json({
-    userToken,
+    token: userToken,
+    group: group,
   });
 
   return;
