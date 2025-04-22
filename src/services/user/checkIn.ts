@@ -9,7 +9,9 @@ interface CreateUserIfNotExistsOutput {
 
 export default async function createUserIfNotExists(
   username: string,
-  name: string
+  name: string,
+  alias: string,
+  id: string
 ): Promise<CreateUserIfNotExistsOutput> {
   const user = await prisma.user.upsert({
     where: { username },
@@ -18,8 +20,10 @@ export default async function createUserIfNotExists(
       name,
     },
     create: {
+      id,
       username,
       name,
+      profileImage: `http://server.palmapp.com.br:8090/imagens/${alias}/${id}.jpg`,
     },
   });
 

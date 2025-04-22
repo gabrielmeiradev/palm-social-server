@@ -14,6 +14,8 @@ model User {
   email    String?   @unique
   type     UserType? @default(Member)
 
+  profileImage String?
+
   likes         Like[]
   posts         Post[]
   Group         Group?  @relation(fields: [groupGroup_id], references: [group_id])

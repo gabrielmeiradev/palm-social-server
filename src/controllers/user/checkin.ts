@@ -8,9 +8,9 @@ import addUserToGroup from "../../services/group/addUser";
 import getFirstGroupByUser from "../../services/group/getFirstByUser";
 
 export async function checkInUser(req: Request, res: Response) {
-  const { username, name, alias } = req.body;
+  const { username, name, alias, id } = req.body;
 
-  if (!username || !name || !alias) {
+  if (!username || !name || !alias || !id) {
     res.status(400).json({ error: "Todos os campos são necessários" });
     return;
   }
@@ -20,7 +20,12 @@ export async function checkInUser(req: Request, res: Response) {
   let group;
 
   try {
-    const { user, wasCreated } = await createUserIfNotExists(username, name);
+    const { user, wasCreated } = await createUserIfNotExists(
+      username,
+      name,
+      alias,
+      id
+    );
 
     userToken = accessTokenFromUser(user);
 
