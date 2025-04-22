@@ -60,6 +60,7 @@ export async function checkInUser(req: Request, res: Response) {
     }
   }
   res.status(StatusCodes.OK).json({
+    user: userCreated,
     token: userToken,
     group: group,
   });
