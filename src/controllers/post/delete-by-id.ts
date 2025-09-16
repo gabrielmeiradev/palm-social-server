@@ -10,8 +10,10 @@ const prisma = new PrismaClient();
 export const deletePostById = async (req: Request, res: Response) => {
   const { id } = req.params;
 
+  console.log("called this");
+
   try {
-    const { id } = userModelFromToken(req.headers.authorization!);
+    const userId = userModelFromToken(req.headers.authorization!).id;
     await prisma.like.deleteMany({
       where: {
         post_id: id,
@@ -24,7 +26,8 @@ export const deletePostById = async (req: Request, res: Response) => {
       },
     });
 
-    if (!post || post.author_id !== id) {
+    if (!post || post.author_id !== userId) {
+      console.log(id, post, post?.author_id);
       res.status(StatusCodes.FORBIDDEN).json({ message: "Não autorizado" });
       return;
     }
@@ -47,7 +50,7 @@ export const deletePostById = async (req: Request, res: Response) => {
         OR: [
           {
             post_id: id,
-            author_id: id,
+            author_id: userId,
           },
           {
             parent_id: id,

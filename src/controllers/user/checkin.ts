@@ -16,7 +16,8 @@ export async function checkInUser(req: Request, res: Response) {
   }
 
   let userToken;
-  let userCreated;
+  let isUserNew;
+  let userEntity;
   let group;
 
   try {
@@ -29,18 +30,17 @@ export async function checkInUser(req: Request, res: Response) {
 
     userToken = accessTokenFromUser(user);
 
-    if (wasCreated) {
-      userCreated = user;
-    }
+    isUserNew = wasCreated;
+    userEntity = user;
     group = await getFirstGroupByUser(user.id);
   } catch (e) {
-    let message = "Erro ao fazer check-in do usuário";
+    let message = "Erro ao fazer check-in do usuário: " + e;
     console.log(message);
     res.status(500).json({ error: message, details: e });
     return;
   }
 
-  if (userCreated) {
+  if (isUserNew) {
     try {
       group = await createGroupIfNotExists(alias);
     } catch (e) {
@@ -51,7 +51,7 @@ export async function checkInUser(req: Request, res: Response) {
     }
 
     try {
-      await addUserToGroup(group.group_id, userCreated.id);
+      await addUserToGroup(group.group_id, userEntity.id);
     } catch (e) {
       let message = "Erro ao fazer adicionar usuário ao grupo";
       console.log(message);
@@ -59,8 +59,14 @@ export async function checkInUser(req: Request, res: Response) {
       return;
     }
   }
+  console.log("Check-in realizado com sucesso");
+  console.log({
+    user: userEntity,
+    token: userToken,
+    group: group,
+  });
   res.status(StatusCodes.OK).json({
-    user: userCreated,
+    user: userEntity,
     token: userToken,
     group: group,
   });

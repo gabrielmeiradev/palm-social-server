@@ -7,11 +7,13 @@ const prisma = new PrismaClient();
 
 export const getAllPosts = async (req: Request, res: Response) => {
   try {
+    console.log("Iniciando busca de postagens...");
     const { text, hashtags, page = 1, itemsPerPage = 10 } = req.query;
     const { groupId } = req.params;
     const user = userModelFromToken(req.headers.authorization!);
 
     if (!user) {
+      console.log("Usuário não autenticado.");
       res.status(StatusCodes.UNAUTHORIZED).json({
         message: "Usuário não autenticado.",
       });
@@ -19,6 +21,7 @@ export const getAllPosts = async (req: Request, res: Response) => {
     }
 
     if (typeof groupId !== "string") {
+      console.log("O ID do grupo deve ser uma string.");
       res.status(StatusCodes.BAD_REQUEST).json({
         message: "O ID do grupo deve ser uma string.",
       });
@@ -40,6 +43,7 @@ export const getAllPosts = async (req: Request, res: Response) => {
       res.status(StatusCodes.BAD_REQUEST).json({
         message: "O número da página deve ser maior que 0.",
       });
+      console.log("O número da página deve ser maior que 0.");
       return;
     }
 
@@ -114,7 +118,8 @@ export const getAllPosts = async (req: Request, res: Response) => {
         },
       }),
     ]);
-
+    console.log("Retornou tudo");
+    console.log(posts);
     res.status(StatusCodes.OK).json({
       posts,
       pagination: {

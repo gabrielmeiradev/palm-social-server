@@ -46,7 +46,7 @@ const upload = multer({
 
 const postRouter = Router();
 
-postRouter.get("/:groupId", getAllPosts);
+postRouter.get("/group/:groupId", getAllPosts);
 
 postRouter.post("/", checkToken, upload.array("media"), createPost);
 
